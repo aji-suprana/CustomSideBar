@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="CustomSideBar.UC_DocPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CustomSideBar"
+             mc:Ignorable="d" 
+             d:DesignHeight="40" d:DesignWidth="250"
+             >
+  <Grid x:Name="Root" Background="LightGray">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="50"></ColumnDefinition>
+      <ColumnDefinition Width="1*"></ColumnDefinition>
+    </Grid.ColumnDefinitions>
+    
+    <Grid.InputBindings>
+      <KeyBinding Command="{Binding RemoveCurrentDocPanel}" Key="Delete" />
+    </Grid.InputBindings>
+    
+    <FrameworkElement Loaded="DocPanelLoaded"/>
+
+    <Border Grid.Column="0">
+      <Image Source="{Binding Icon}" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+    </Border>
+    
+    <Border Grid.Column="1">
+      <TextBlock Text ="{Binding DocName}" Margin="0,10,0,10"  TextAlignment="Left" VerticalAlignment="Center" Foreground="White" FontSize="15"/>
+    </Border>
+  </Grid>
+</UserControl>
