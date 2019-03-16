@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Input;
-
+using Newtonsoft.Json;
+using CustomSideBar.UserControls;
 namespace CustomSideBar
 {
 
@@ -35,12 +36,21 @@ namespace CustomSideBar
 
       filedetection = new CSB_FileDropDetection();
 
-      Testing();
+      UnitTesting();
     }
-
-    void Testing()
+    ~MainWindow()
     {
-      Utilities.CSB_SaveLoad.SaveDocPanel();
+      Activated -= CSB_WindowsEvent.WindowsActivated;
+      Deactivated -= CSB_WindowsEvent.WindowsDeactivated;
+      StateChanged -= CSB_WindowsEvent.WindowsStateChanged;
+      DragEnter -= CSB_WindowsEvent.DragEnter;
+      Closing -= CSB_WindowsEvent.WindowClosing;
+      Drop -= CSB_WindowsEvent.Drop;
+    }
+    void UnitTesting()
+    {
+      //Utilities.CSB_SaveLoad.SaveDocPanel();
+      UC_Collections.UnitTest();
     }
 
 

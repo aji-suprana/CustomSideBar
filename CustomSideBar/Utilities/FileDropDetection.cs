@@ -8,6 +8,7 @@ using System.IO;
 using CustomSideBar.Utilities;
 using System.Net;
 using System.Text.RegularExpressions;
+using CustomSideBar.UserControls;
 
 namespace CustomSideBar
 {
@@ -43,6 +44,10 @@ namespace CustomSideBar
     {
     }
 
+    /// <summary>
+    /// Getting Icon from a folder path/extension.
+    /// </summary>
+    /// <returns></returns>
     static public ImageSource getExtensionIcon(string path,DraggedFileType fileType)
     {
       CSB_IconManager.ItemState fileItemState = CSB_IconManager.ItemState.Undefined;
@@ -59,7 +64,11 @@ namespace CustomSideBar
 
       return ConvertIcoToImageSource(icon);
     }
-
+    
+    /// <summary>
+    /// Converting Icon datatype to ImageSource Datatype, WPF does not display Icon Data type.
+    /// </summary>
+    /// <returns></returns>
     static public ImageSource ConvertIcoToImageSource(Icon ico)
     {
       ImageSource imageSource;
@@ -73,6 +82,9 @@ namespace CustomSideBar
       }
     }
 
+    /// <summary>
+    /// Drop Event Handler, is Binded to MainWindow.Drop Event.
+    /// </summary>
     void Drop(object obj, DragEventArgs e)
     {
       Console.WriteLine("[CSB_FileDropDetection] Drop()");
@@ -81,7 +93,7 @@ namespace CustomSideBar
       foreach(var it in newItems)
       {
         bool docExisted = false;
-        foreach(var docPanel in UC_DocPanel.docPanelObjects)
+        foreach(var docPanel in UC_Collections.DocItems)
         {
           if (docPanel.FullName == it.FullName)
             docExisted |= true;
@@ -89,16 +101,24 @@ namespace CustomSideBar
         if (docExisted)
           return;
 
-        UC_DocPanel newDocPanel = new UC_DocPanel();
+        UC_DocItem newDocPanel = new UC_DocItem();
         newDocPanel.DocName = it.Name;
         newDocPanel.FullName = it.FullName;
         newDocPanel.DocPath = it.Path;
         newDocPanel.Icon = it.Icon;
 
+        if (newDocPanel.DocName == "")
+          newDocPanel.DocName = newDocPanel.FullName;
+
         MainWindow.instance.DocPanelList.Children.Add(newDocPanel);
       }
-    }
 
+      Serializer.CSB_SaveLoad.SaveDocItems();
+    }
+    
+    /// <summary>
+    /// Getting Data from Drop Event Retrieve File/Other Data Dragged onto CSB window. Returning all data as DraggedData, docPanel Readable data.
+    /// </summary>
     List<DraggedData> ProcessDraggedData(DragEventArgs e)
     {
       List<DraggedData> draggedData = new List<DraggedData>();
@@ -147,21 +167,30 @@ namespace CustomSideBar
       FileAttributes attr = File.GetAttributes(_path);
       //detect whether its a directory or file
 
+      //Check if this fil is directoryy or file
       if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
       {
         Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:{0} is a directory", _path);
+        //Display name on doc panel
         returnData.Name = Path.GetFileName(_path);
+        //Fullname to check wether same docpanel existed
         returnData.FullName = returnData.Name + ".winDirectory";
+        //path to execute when doc panel is double clicked
         returnData.Path = _path;
+        //Display icon
         returnData.Icon = getExtensionIcon(_path,DraggedFileType.Folder);
         Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:Name is {0}", returnData.Name);
       }
       else
       {
         Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:{0} a file", _path);
+        //Display name on doc panel
         returnData.Name = Path.GetFileNameWithoutExtension(_path);
+        //Fullname to check wether same docpanel existed
         returnData.FullName = Path.GetFileName(_path);
+        //path to execute when doc panel is double clicked
         returnData.Path = _path;
+        //Display icon
         returnData.Icon = getExtensionIcon(_path, DraggedFileType.File);
         Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:Name is {0}", returnData.Name);
 
@@ -179,13 +208,15 @@ namespace CustomSideBar
     {
       Console.WriteLine("[CSB_FileDropDetection][ParseTextData]");
 
-
+      //Check text is a valid web link
       bool validLink = Uri.IsWellFormedUriString(text, UriKind.Absolute);
-      Console.WriteLine("[CSB_FileDropDetection][ParseTextData]:Text is a valid link?{0}", validLink);
+      Console.WriteLine("[CSB_FileDropDetection][ParseTextData]:Text is a valid link? {0}", validLink);
       if(validLink)
       {
         return ParseWebLink(text);
       }
+      //Do text next checking bellow ...
+
       return null;
     }
 

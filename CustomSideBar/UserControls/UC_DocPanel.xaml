@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CustomSideBar.UC_DocPanel"
+﻿<UserControl x:Class="CustomSideBar.UserControls.UC_DocItem"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="40" d:DesignWidth="250"
              >
-  <Grid x:Name="Root" Background="LightGray">
+  <Grid x:Name="Root" Background="Gray" Margin="0,1,0,1">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="50"></ColumnDefinition>
       <ColumnDefinition Width="1*"></ColumnDefinition>

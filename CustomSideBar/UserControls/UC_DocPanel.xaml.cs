@@ -5,11 +5,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Newtonsoft.Json.Linq;
+using CustomSideBar.Serializer;
 
-namespace CustomSideBar
+namespace CustomSideBar.UserControls
 {
 
-  public partial class UC_DocPanel : UserControl
+  public partial class UC_DocItem : UserControl, ISerializableObject
   {
     //delegates
     public delegate void DocPanelClicked(int DocPanelID);
@@ -18,7 +20,7 @@ namespace CustomSideBar
     public static DocPanelClicked docPanelClicked = null;
 
     //selection states
-    public static List< UC_DocPanel> docPanelObjects = new List< UC_DocPanel>();
+   // public static List< UC_DocItem> docPanelObjects = new List< UC_DocItem>();
     private static int selected = -1;
     public static int hoveredID = -1;
 
@@ -29,22 +31,74 @@ namespace CustomSideBar
     public int Id { get; set; }
     public string FullName { get; set; }
 
+
+
+    public SolidColorBrush SelectedColor
+    {
+      get { return (SolidColorBrush)GetValue(SelectedColorProperty); }
+      set { SetValue(SelectedColorProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for SelectedColor.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty SelectedColorProperty =
+        DependencyProperty.Register(
+          "SelectedColor",
+          typeof(SolidColorBrush),
+          typeof(UC_DocItem),
+          new PropertyMetadata((SolidColorBrush)(new BrushConverter().ConvertFrom("#333333"))));
+
+
+
+    public SolidColorBrush NormalColor
+    {
+      get { return (SolidColorBrush)GetValue(NormalColorProperty); }
+      set { SetValue(NormalColorProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for NormalColor.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty NormalColorProperty =
+        DependencyProperty.Register(
+          "NormalColor", 
+          typeof(SolidColorBrush),
+          typeof(UC_DocItem), 
+          new PropertyMetadata(new BrushConverter().ConvertFrom("#1e1e1e")));
+
+
+
     //Privates
     private bool isHovered = false;
 
-    public UC_DocPanel()
+    public UC_DocItem()
     {
       InitializeComponent();
       DataContext = this;
-      Id = docPanelObjects.Count();
-      docPanelObjects.Add(this);
-
-      Testing();
+      Id = UC_Collections.DocItems.Count();
+      UC_Collections.DocItems.Add(this);
     }
 
-    ~UC_DocPanel()
+    ~UC_DocItem()
     {
+      Console.WriteLine("adsfadfsdfasdfasdfasdfasdfasdf");
+    }
 
+    public JObject Serialize()
+    {
+      JObject DocData = new JObject();
+      DocData.Add(new JProperty("DocName", DocName));
+      DocData.Add(new JProperty("DocPath", DocPath));
+
+     // Console.WriteLine(DocData.ToString());
+
+      return DocData;
+    }
+
+    public UC_DocItem Deserialize(string JsonString)
+    {
+      //JProperty DocName = j.Property("DocName");
+      //JProperty DocPath = j.Property("DocPath");
+
+
+      return null;
     }
 
     private void DocPanelLoaded(object sender, RoutedEventArgs e)
@@ -53,15 +107,8 @@ namespace CustomSideBar
       window.Root.MouseLeftButtonUp += Select;
       window.Root.MouseMove += CheckIsHovered;
 
-      window.Root.KeyDown += RemoveCurrentDocPanel;
+      window.Root.KeyDown += RemoveCurrentDocItem;
 
-    }
-
-    void Testing()
-    {
-      //DocPath = "C:\\Users\\Aji Suprana\\Desktop\\Might & Magic Heroes VI.url";
-      //DocName = "Might & Magic Heroes VI";
-      //Icon = CSB_FileDropDetection.getExtensionIcon(DocPath);
     }
 
     void Select(object obj, EventArgs e)
@@ -71,9 +118,9 @@ namespace CustomSideBar
 
       if (hoveredID == -1)
       {
-        foreach (var it in docPanelObjects)
+        foreach (var it in UC_Collections.DocItems)
         {
-          it.Root.Background = Brushes.Gray;
+          it.Root.Background =NormalColor;
         }
         return;
       }
@@ -81,13 +128,14 @@ namespace CustomSideBar
 
       if (hoveredID == Id)
       {
-        Console.WriteLine("[UC_DocPanel]:Id {1} Name {0} is Clicked", DocName, Id);
-        docPanelObjects[Id].Root.Background = Brushes.DarkGray;
+        Console.WriteLine("[UC_DocItem]:Id {1} Name {0} is Clicked", DocName, Id);
+
+        UC_Collections.DocItems[Id].Root.Background = SelectedColor;
         selected = Id;
       }
       else
       {
-        docPanelObjects[Id].Root.Background = Brushes.Gray;
+        UC_Collections.DocItems[Id].Root.Background = NormalColor;
       }
 
       if(docPanelClicked!=null)
@@ -102,7 +150,7 @@ namespace CustomSideBar
 
     int GetHoveredID()
     {
-      foreach(var it in docPanelObjects)
+      foreach(var it in UC_Collections.DocItems)
       {
         if (it.isHovered)
           return it.Id;
@@ -113,28 +161,38 @@ namespace CustomSideBar
     private void UpdateIDs()
     {
       int i = 0;
-      foreach(var it in docPanelObjects)
+      foreach(var it in UC_Collections.DocItems)
       {
         it.Id = i;
         i++;
       }
     }
 
-    private void RemoveCurrentDocPanel(object sender, KeyEventArgs e)
+    private void RemoveCurrentDocItem(object sender, KeyEventArgs e)
     {
       if (selected != Id)
         return;
 
       if (e.Key == Key.Delete)
       {
-        var window = (MainWindow)Window.GetWindow(this);
-        window.Root.MouseLeftButtonUp -= this.Select;
-        Console.WriteLine("[UC_DocPanel]:{0} going to be deleted", Id);
-        docPanelObjects.RemoveAt(Id);
-        ((StackPanel)this.Parent).Children.Remove(this);
-        UpdateIDs();
+        Console.WriteLine("[UC_DocItem]:{0} going to be deleted", Id);
+        RemoveUC_DocItem();
         e.Handled = true;
       }
+    }
+
+    private void RemoveUC_DocItem()
+    {
+      var window = (MainWindow)Window.GetWindow(this);
+
+      window.Root.MouseLeftButtonUp -= this.Select;
+      window.Root.MouseMove -= CheckIsHovered;
+      window.Root.KeyDown -= RemoveCurrentDocItem;
+
+      ((StackPanel)this.Parent).Children.Remove(this);
+      UC_Collections.DocItems.RemoveAt(Id);
+      UpdateIDs();
+
     }
   }
 }

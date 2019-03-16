@@ -1,13 +1,13 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:CustomSideBar">
+    xmlns:local="clr-namespace:CustomSideBar.UserControls">
 
 
-    <Style TargetType="{x:Type local:UC_DocPanel}">
+    <Style TargetType="{x:Type local:UC_DocItem}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:UC_DocPanel}">
+                <ControlTemplate TargetType="{x:Type local:UC_DocItem}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">

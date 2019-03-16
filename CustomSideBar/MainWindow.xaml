@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CustomSideBar"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="250" Left="0" Top="0">
-  <Grid x:Name="Root" Background="Gray" >
+        Title="MainWindow" Height="1000" Width="150" Left="0" Top="0">
+  <Grid x:Name="Root" Background="Black" >
     <Grid.RowDefinitions>
       <RowDefinition Height="50"></RowDefinition>
       <RowDefinition Height="1*"></RowDefinition>
