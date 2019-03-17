@@ -71,7 +71,8 @@ namespace WpfAppBar
             ABN_STATECHANGE = 0,
             ABN_POSCHANGED,
             ABN_FULLSCREENAPP,
-            ABN_WINDOWARRANGE
+            ABN_WINDOWARRANGE,
+
         }
 
         internal enum MonitorDefaultTo

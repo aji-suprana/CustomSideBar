@@ -4,17 +4,25 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CustomSideBar"
+        xmlns:uc="clr-namespace:CustomSideBar.UserControls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="400" Left="0" Top="0">
+        Title="MainWindow" Height="1000" Width="150" Left="0" Top="0">
+  <Window.Resources>
+    <SolidColorBrush x:Key="mouseOverColor"
+                    Color="Red" />
+  </Window.Resources>
   <Grid x:Name="Root" Background="Black" >
     <Grid.RowDefinitions>
       <RowDefinition Height="50"></RowDefinition>
       <RowDefinition Height="1*"></RowDefinition>
+      <RowDefinition Height="50"></RowDefinition>
     </Grid.RowDefinitions>
-    <Button Grid.Row="0" Click="CloseClicked" FontSize="20">Close</Button>
+    <uc:UC_HamburgerPanel Grid.Row="0" Loaded="UC_HamburgerPanel_Loaded"/>
+
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
       <StackPanel x:Name="DocItemsPanel">
       </StackPanel>
     </ScrollViewer>
+    <Button Grid.Row="2" Click="CloseClicked" FontSize="17" Background="Black" Foreground="White">Close</Button>
   </Grid>
 </Window>

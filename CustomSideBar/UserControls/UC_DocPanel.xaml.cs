@@ -86,7 +86,6 @@ namespace CustomSideBar.UserControls
     {
       InitializeComponent();
       DataContext = this;
- 
     }
 
     ~UC_DocItem()
@@ -221,8 +220,9 @@ namespace CustomSideBar.UserControls
       var window = (MainWindow)Window.GetWindow(this);
       window.Root.MouseLeftButtonUp += Select;
       window.Root.MouseMove += CheckIsHovered;
-
       window.Root.KeyDown += KeyDownHandler;
+      MouseDoubleClick += MouseButtonEventHandler;
+
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ namespace CustomSideBar.UserControls
 
       if (hoveredID == Id)
       {
-        Console.WriteLine("[UC_DocItem]:Id {1} Name {0} is Clicked", DocName, Id);
+        Console.WriteLine("[UC_DocItem]:Id {1}: Name {0}: Clicked", DocName, Id);
 
         UC_Collections.DocItems[Id].Root.Background = SelectedColor;
         selected = Id;
@@ -267,9 +267,22 @@ namespace CustomSideBar.UserControls
       hoveredID = GetHoveredID();
     }
 
+    /// <summary>
+    /// Notify property changed
+    /// </summary>
     private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
     {
       PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Doubleclicked handler
+    /// </summary>
+    void MouseButtonEventHandler(object sender, MouseButtonEventArgs e)
+    {
+      Console.WriteLine("[UC_DocItem]:Id {1}: Name {0}: DoubleClicked", DocName, Id);
+      Utilities.ProcessManager.AddProcess(DocName, DocPath, DocFormat);
+
     }
     ///////////////////////////////////////////////////////////////////////
     /// Creation & Deletion

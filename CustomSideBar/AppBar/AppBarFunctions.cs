@@ -38,6 +38,7 @@ namespace WpfAppBar
       public IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam,
                               IntPtr lParam, ref bool handled)
       {
+
         if (msg == CallbackId)
         {
           if (wParam.ToInt32() == (int)Interop.ABNotify.ABN_POSCHANGED)
@@ -45,6 +46,18 @@ namespace WpfAppBar
             ABSetPos(this, Window, ChildElement);
             handled = true;
           }
+ 
+        }
+
+        if(msg == 16)
+        {
+          Console.WriteLine("[Interop]:windows is closing", msg, wParam, lParam);
+          foreach(var i in RegisteredWindowInfo)
+          {
+            WpfAppBar.AppBarFunctions.SetAppBar(i.Key, WpfAppBar.ABEdge.None);
+
+          }
+
         }
         return IntPtr.Zero;
       }
@@ -52,6 +65,7 @@ namespace WpfAppBar
     }
     private static readonly Dictionary<Window, RegisterInfo> RegisteredWindowInfo
         = new Dictionary<Window, RegisterInfo>();
+
     private static RegisterInfo GetRegisterInfo(Window appbarWindow)
     {
       RegisterInfo reg;

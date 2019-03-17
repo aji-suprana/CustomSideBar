@@ -22,30 +22,35 @@ namespace CustomSideBar
       InitializeComponent();
 
       //Event Listener
-      Activated+=CSB_WindowsEvent.WindowsActivated;
-      Deactivated += CSB_WindowsEvent.WindowsDeactivated;
-      StateChanged += CSB_WindowsEvent.WindowsStateChanged;
-      DragEnter += CSB_WindowsEvent.DragEnter;
-      Closing += CSB_WindowsEvent.WindowClosing;
-      Drop += CSB_WindowsEvent.Drop;
+      Activated += WindowsActivated;
+      Deactivated += WindowsDeactivated;
+      StateChanged += WindowsStateChanged;
+      DragEnter += DragEnterHandler;
+      Closing += WindowClosing;
+      Drop += DropHandler;
+      Closed += WindowClosed;
+      KeyDown += wnd_KeyDown;
+
       //MouseMove += CheckIsHovered;
 
       //Setup Statuses
       AllowDrop = true;
       instance = this;
+      ShowInTaskbar = false;
 
       filedetection = new CSB_FileDropDetection();
-
       UnitTesting();
     }
     ~MainWindow()
     {
-      Activated -= CSB_WindowsEvent.WindowsActivated;
-      Deactivated -= CSB_WindowsEvent.WindowsDeactivated;
-      StateChanged -= CSB_WindowsEvent.WindowsStateChanged;
-      DragEnter -= CSB_WindowsEvent.DragEnter;
-      Closing -= CSB_WindowsEvent.WindowClosing;
-      Drop -= CSB_WindowsEvent.Drop;
+      Activated -= WindowsActivated;
+      Deactivated -= WindowsDeactivated;
+      StateChanged -= WindowsStateChanged;
+      DragEnter -= DragEnterHandler;
+      Closing -= WindowClosing;
+      Drop -= DropHandler;
+      Closed -= WindowClosed;
+
     }
     void UnitTesting()
     {
@@ -64,7 +69,6 @@ namespace CustomSideBar
 
     protected override void OnClosing(CancelEventArgs e)
     {
-      e.Cancel = false;
       WpfAppBar.AppBarFunctions.SetAppBar(this, WpfAppBar.ABEdge.None);
       base.OnClosing(e);
       //Closing(this, e);
@@ -77,6 +81,68 @@ namespace CustomSideBar
       //WpfAppBar.AppBarFunctions.SetAppBar(this, WpfAppBar.ABEdge.None);
       //e.Handled = false;
       Close();
+    }
+
+    //Event handler when windows is activated, binded in MainWindows.xaml.cs
+    public static void WindowsActivated(object obj, EventArgs args)
+    {
+      Console.WriteLine("[MainWindow] WindowsActinvated()");
+      Window window = (Window)obj;
+      window.Topmost = true;
+      WpfAppBar.AppBarFunctions.SetAppBar((Window)obj, WpfAppBar.ABEdge.Left);
+
+    }
+
+    //Event handler when windows is deactivated, binded in MainWindows.xaml.cs
+    public static void WindowsDeactivated(object obj, EventArgs args)
+    {
+      Console.WriteLine("[MainWindow] WindowsDeactivated()");
+    }
+
+    //Event handler when windows state is changed, binded in MainWindows.xaml.cs
+    private void WindowsStateChanged(object obj, EventArgs args)
+    {
+      Console.WriteLine("[MainWindow] WindowsStateChanged()");
+      this.Hide();
+    }
+
+    //Drag Event handler when windows state is changed, binded in MainWindows.xaml.cs
+    public static void DragEnterHandler(object obj, DragEventArgs e)
+    {
+      Console.WriteLine("[MainWindow] DragEnter()");
+      e.Effects = DragDropEffects.Move;
+    }
+
+    //Drag Event handler when windows state is changed, binded in MainWindows.xaml.cs
+    public static void DropHandler(object obj, DragEventArgs e)
+    {
+      Console.WriteLine("[MainWindow] Drop()");
+    }
+
+    public static void WindowClosing(object obj, EventArgs e)
+    {
+      Console.WriteLine("[MainWindow] WindowClosing()");
+
+      WpfAppBar.AppBarFunctions.SetAppBar((Window)obj, WpfAppBar.ABEdge.None);
+    }
+    public static void WindowClosed(object obj, EventArgs e)
+    {
+      Console.WriteLine("[MainWindow] WindowClosed()");
+
+    }
+
+
+    void wnd_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.Key == Key.System && e.SystemKey == Key.F4)
+      {
+        e.Handled = true;
+      }
+    }
+
+    private void UC_HamburgerPanel_Loaded(object sender, RoutedEventArgs e)
+    {
+
     }
   }
 }
