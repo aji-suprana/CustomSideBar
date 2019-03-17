@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CustomSideBar"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="150" Left="0" Top="0">
+        Title="MainWindow" Height="1000" Width="400" Left="0" Top="0">
   <Grid x:Name="Root" Background="Black" >
     <Grid.RowDefinitions>
       <RowDefinition Height="50"></RowDefinition>
@@ -13,7 +13,7 @@
     </Grid.RowDefinitions>
     <Button Grid.Row="0" Click="CloseClicked" FontSize="20">Close</Button>
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-      <StackPanel x:Name="DocPanelList">
+      <StackPanel x:Name="DocItemsPanel">
       </StackPanel>
     </ScrollViewer>
   </Grid>

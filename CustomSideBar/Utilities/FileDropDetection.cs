@@ -7,17 +7,15 @@ using System.Windows.Media.Imaging;
 using System.IO;
 using CustomSideBar.Utilities;
 using System.Net;
-using System.Text.RegularExpressions;
 using CustomSideBar.UserControls;
 
 namespace CustomSideBar
 {
-  enum FileFormats
+  public enum FileFormats
   {
-    googlelink,
+    webLink,
     folder,
-    executable,
-
+    file
   }
 
   public class CSB_FileDropDetection
@@ -30,6 +28,7 @@ namespace CustomSideBar
       public string Path { get; set; }
       public string Name { get; set; }
       public string FullName { get; set; }
+      public FileFormats Formats { get; set; }
       public ImageSource Icon { get; set; }
     }
 
@@ -48,20 +47,24 @@ namespace CustomSideBar
     /// Getting Icon from a folder path/extension.
     /// </summary>
     /// <returns></returns>
-    static public ImageSource getExtensionIcon(string path,DraggedFileType fileType)
+    static public ImageSource getExtensionIcon(string path,FileFormats fileType)
     {
       CSB_IconManager.ItemState fileItemState = CSB_IconManager.ItemState.Undefined;
       Icon icon = null;
-      if (fileType == DraggedFileType.Folder)
+      switch (fileType)
       {
-        fileItemState = CSB_IconManager.ItemState.Open;
-        icon = CSB_IconManager.GetIcon(path, fileType, CSB_IconManager.IconSize.Small, fileItemState);
-      }
-      else
-      {
-        icon = Icon.ExtractAssociatedIcon(path);
-      }
+        case FileFormats.file:
+          icon = Icon.ExtractAssociatedIcon(path);
+          break;
+        case FileFormats.folder:
+          fileItemState = CSB_IconManager.ItemState.Open;
+          icon = CSB_IconManager.GetIcon(path, DraggedFileType.Folder, CSB_IconManager.IconSize.Small, fileItemState);
+          break;
+        case FileFormats.webLink:
+          icon = CSB_IconManager.GetIcon(".html", DraggedFileType.File, CSB_IconManager.IconSize.Small, fileItemState);
 
+          break;
+      }
       return ConvertIcoToImageSource(icon);
     }
     
@@ -101,16 +104,10 @@ namespace CustomSideBar
         if (docExisted)
           return;
 
-        UC_DocItem newDocPanel = new UC_DocItem();
-        newDocPanel.DocName = it.Name;
-        newDocPanel.FullName = it.FullName;
-        newDocPanel.DocPath = it.Path;
-        newDocPanel.Icon = it.Icon;
+        UC_DocItem newDocPanel = UC_DocItem.Add(it.Name,it.Path,it.FullName,it.Formats,it.Icon);
 
         if (newDocPanel.DocName == "")
           newDocPanel.DocName = newDocPanel.FullName;
-
-        MainWindow.instance.DocPanelList.Children.Add(newDocPanel);
       }
 
       Serializer.CSB_SaveLoad.SaveDocItems();
@@ -177,9 +174,12 @@ namespace CustomSideBar
         returnData.FullName = returnData.Name + ".winDirectory";
         //path to execute when doc panel is double clicked
         returnData.Path = _path;
+        //fileformat store for deserializing data
+        returnData.Formats = FileFormats.folder;
         //Display icon
-        returnData.Icon = getExtensionIcon(_path,DraggedFileType.Folder);
-        Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:Name is {0}", returnData.Name);
+        returnData.Icon = getExtensionIcon(_path,FileFormats.folder);
+
+
       }
       else
       {
@@ -190,11 +190,18 @@ namespace CustomSideBar
         returnData.FullName = Path.GetFileName(_path);
         //path to execute when doc panel is double clicked
         returnData.Path = _path;
+        //fileformat store for deserializing data
+        returnData.Formats = FileFormats.file;
         //Display icon
-        returnData.Icon = getExtensionIcon(_path, DraggedFileType.File);
-        Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:Name is {0}", returnData.Name);
+        returnData.Icon = getExtensionIcon(_path, FileFormats.file);
 
       }
+      Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:Name is {0}", returnData.Name);
+      Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:Path is {0}", returnData.Path);
+      Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:FullName is {0}", returnData.FullName);
+      Console.WriteLine("[CSB_FileDropDetection][ParseFileData]:Format is {0}", returnData.Formats.ToString());
+      Console.WriteLine("");
+
       return returnData;
     }
 
@@ -230,18 +237,11 @@ namespace CustomSideBar
     {
       DraggedData returnedData = new DraggedData();
 
-      using (WebClient client = new WebClient()) // WebClient class inherits IDisposable
-      {
-        // Or you can get the file content without saving it
-        string htmlCode = client.DownloadString(path);
-        string title = Regex.Match(htmlCode, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
-
-        returnedData.Name = title;
-        returnedData.FullName =title + ".webLinkOnline";
-        returnedData.Path = path;
-        Icon ico = CSB_IconManager.GetIcon(".html", DraggedFileType.File, CSB_IconManager.IconSize.Small, CSB_IconManager.ItemState.Undefined);
-        returnedData.Icon = ConvertIcoToImageSource(ico);
-      }
+      returnedData.Path = path;
+      returnedData.FullName = path;
+      returnedData.Formats = FileFormats.webLink;
+      ImageSource ico = getExtensionIcon(".html",FileFormats.webLink);
+      returnedData.Icon = ico;
 
       Console.WriteLine("[CSB_FileDropDetection][ParseTextData]:Name is {0}", returnedData.Name);
 

@@ -51,6 +51,7 @@ namespace CustomSideBar
     {
       //Utilities.CSB_SaveLoad.SaveDocPanel();
       UC_Collections.UnitTest();
+      Serializer.CSB_SaveLoad.CSBSaveLoad_UnitTest();
     }
 
 

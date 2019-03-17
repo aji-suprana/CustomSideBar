@@ -13,10 +13,15 @@ namespace CustomSideBar.Serializer
   public interface ISerializableObject
   {
     JObject Serialize();
+    void Deserialize(JToken token);
   }
 
   class CSB_SaveLoad
   {
+    public static void CSBSaveLoad_UnitTest()
+    {
+      LoadDocItems();
+    }
     public static void SaveDocItems()
     {
       string AppDataPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -32,8 +37,18 @@ namespace CustomSideBar.Serializer
       System.IO.File.WriteAllText(SavingPath, JsonString);
     }
 
-    public static void LoadDocPanel()
+    public static void LoadDocItems()
     {
+      string AppDataPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+      string CSBConfigPath = @"\CustomSideBar\";
+      string SavingPath = AppDataPath + CSBConfigPath + "CSB_DocItems.sav";
+      Console.WriteLine("[CSB_SaveLoad]:Loading from {0}", SavingPath);
+
+      string JsonString = System.IO.File.ReadAllText(SavingPath);
+      JObject JsonObject = JObject.Parse(JsonString);
+
+      UserControls.UC_Collections.DeserializeDocItems(JsonObject);
+
 
     }
   }

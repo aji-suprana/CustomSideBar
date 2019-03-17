@@ -328,3 +328,7 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+RegexTesting/RegexTesting.csproj
+MultiThreadingSandbox/MultiThreadingSandbox.csproj
+RegexTesting/Program.cs
+MultiThreadingSandbox/Program.cs
