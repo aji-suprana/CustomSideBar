@@ -44,11 +44,13 @@ namespace CustomSideBar.Serializer
       string SavingPath = AppDataPath + CSBConfigPath + "CSB_DocItems.sav";
       Console.WriteLine("[CSB_SaveLoad]:Loading from {0}", SavingPath);
 
-      string JsonString = System.IO.File.ReadAllText(SavingPath);
-      JObject JsonObject = JObject.Parse(JsonString);
+      if (System.IO.File.Exists(SavingPath))
+      {
+        string JsonString = System.IO.File.ReadAllText(SavingPath);
+        JObject JsonObject = JObject.Parse(JsonString);
 
-      UserControls.UC_Collections.DeserializeDocItems(JsonObject);
-
+        UserControls.UC_Collections.DeserializeDocItems(JsonObject);
+      }
 
     }
   }

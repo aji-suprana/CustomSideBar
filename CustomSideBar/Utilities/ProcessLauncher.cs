@@ -20,6 +20,9 @@ namespace CustomSideBar.Utilities
         case FileFormats.file:
           newProcess.StartInfo.FileName = path;
           break;
+        case FileFormats.webLink:
+          newProcess.StartInfo.FileName = path;
+          break;
       }
       newProcess.Start();
     }
